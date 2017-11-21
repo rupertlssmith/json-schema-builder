@@ -82,16 +82,3 @@ primitive : Decoder result -> Builder result
 primitive decoder =
     Builder
         (always decoder)
-
-
-
----
-
-
-type alias Test =
-    { a : String }
-
-
-test =
-    object Test
-        |> with (field "a" string)
