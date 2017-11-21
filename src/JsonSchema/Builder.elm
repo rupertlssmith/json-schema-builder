@@ -32,6 +32,10 @@ type ObjectBuilder result
     = ObjectBuilder (() -> Decoder result)
 
 
+type FieldBuilder result
+    = FieldBuilder String (() -> Decoder result)
+
+
 {-| Runs the builder.
 -}
 build : ObjectBuilder result -> Result result
@@ -47,11 +51,7 @@ object ctr =
     ObjectBuilder (always (Decode.succeed ctr))
 
 
-map2 :
-    (a -> b -> c)
-    -> ObjectBuilder a
-    -> ObjectBuilder b
-    -> ObjectBuilder c
+map2 : (a -> b -> c) -> ObjectBuilder a -> ObjectBuilder b -> ObjectBuilder c
 map2 f (ObjectBuilder decoderA) (ObjectBuilder decoderB) =
     let
         joinedDecoder selectionSet =
@@ -62,23 +62,26 @@ map2 f (ObjectBuilder decoderA) (ObjectBuilder decoderB) =
 
 {-| Adds fields to an object.
 -}
-with :
-    ObjectBuilder a
-    -> ObjectBuilder (a -> b)
-    -> ObjectBuilder b
-with selection objectSpec =
-    map2 (<|) objectSpec selection
+with : FieldBuilder a -> ObjectBuilder (a -> b) -> ObjectBuilder b
+with fieldSpec objectSpec =
+    map2 (<|) objectSpec (extract fieldSpec)
+
+
+extract : FieldBuilder a -> ObjectBuilder a
+extract (FieldBuilder field decoder) =
+    ObjectBuilder (selectionDecoder field decoder)
+
+
+selectionDecoder : String -> (() -> Decoder result) -> (() -> Decoder result)
+selectionDecoder field decoder =
+    Decode.field field << decoder
 
 
 {-| Builds a field.
 -}
-field :
-    String
-    -> ObjectBuilder result
-    -> ObjectBuilder result
+field : String -> ObjectBuilder result -> FieldBuilder result
 field name (ObjectBuilder decoder) =
-    ObjectBuilder
-        decoder
+    FieldBuilder name decoder
 
 
 {-| Defines the type of a field as a string.
@@ -90,5 +93,4 @@ string =
 
 primitive : Decoder result -> ObjectBuilder result
 primitive decoder =
-    ObjectBuilder
-        (always decoder)
+    ObjectBuilder (always decoder)

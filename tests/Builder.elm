@@ -8,8 +8,23 @@ import Json.Decode as Decode
 import Result exposing (Result)
 
 
+-- Basic types.
+-- Objects with simple fields.
+
+
 type alias Object =
     { a : String }
+
+
+
+-- Objects with nested objects.
+-- Objects with mutually recursive relationships.
+-- Arrays of simple types.
+-- String formats.
+-- Required and optional fields.
+-- Value restrictions.
+-- Object property restrictions.
+-- Null, oneOf, allOf and anyOf.
 
 
 example =
