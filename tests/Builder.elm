@@ -61,4 +61,4 @@ testDecodeObjectSimpleFields =
                         object
 
                 Err error ->
-                    Expect.fail <| "did not decode correctly." ++ error
+                    Expect.fail <| "Failed to decode:" ++ error
