@@ -1,8 +1,16 @@
-module JsonSchema.Builder exposing (Result)
+module JsonSchema.Builder
+    exposing
+        ( Result
+        , build
+        , object
+        , with
+        , field
+        , string
+        )
 
 {-| Module docs
 
-@docs Result
+@docs Result, build, object, with, field
 
 -}
 
@@ -22,6 +30,12 @@ type alias Result result =
 
 type Builder result
     = Builder (() -> Decoder result)
+
+
+build : Builder result -> Result result
+build (Builder decodeF) =
+    { decoder = decodeF ()
+    }
 
 
 object : (fields -> a) -> Builder (fields -> a)
