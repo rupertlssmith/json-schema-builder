@@ -6,11 +6,15 @@ module JsonSchema.Builder
         , with
         , field
         , string
+        , integer
+        , number
+        , boolean
         )
 
 {-| Module docs
 
-@docs Result, build, object, with, field, string
+@docs string, integer, number, boolean
+@docs Result, build, object, with, field
 
 -}
 
@@ -84,11 +88,32 @@ field name (ValueBuilder decoder) =
     FieldBuilder name decoder
 
 
-{-| Defines the type of a field as a string.
+{-| Builds a string type.
 -}
 string : ValueBuilder String
 string =
     primitive Decode.string
+
+
+{-| Builds an integer type.
+-}
+integer : ValueBuilder Int
+integer =
+    primitive Decode.int
+
+
+{-| Builds a number (float) type.
+-}
+number : ValueBuilder Float
+number =
+    primitive Decode.float
+
+
+{-| Builds a boolean type.
+-}
+boolean : ValueBuilder Bool
+boolean =
+    primitive Decode.bool
 
 
 primitive : Decoder result -> ValueBuilder result
