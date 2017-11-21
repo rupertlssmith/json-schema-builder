@@ -25,24 +25,24 @@ import Json.Encode as Encode
 
 {-| The result.
 -}
-type alias Result result =
+type alias Result a =
     { --schema : List JsonSchema.ObjectSchemaProperty -> Schema
       --, enocoder : a -> Encode.Value
-      decoder : Decoder result
+      decoder : Decoder a
     }
 
 
-type ValueBuilder result
-    = ValueBuilder (() -> Decoder result)
+type ValueBuilder a
+    = ValueBuilder (() -> Decoder a)
 
 
-type FieldBuilder result
-    = FieldBuilder String (() -> Decoder result)
+type FieldBuilder a
+    = FieldBuilder String (() -> Decoder a)
 
 
 {-| Runs the builder.
 -}
-build : ValueBuilder result -> Result result
+build : ValueBuilder a -> Result a
 build (ValueBuilder decodeF) =
     { decoder = decodeF ()
     }
@@ -76,14 +76,14 @@ extract (FieldBuilder field decoder) =
     ValueBuilder (fieldDecoder field decoder)
 
 
-fieldDecoder : String -> (() -> Decoder result) -> (() -> Decoder result)
+fieldDecoder : String -> (() -> Decoder a) -> (() -> Decoder a)
 fieldDecoder field decoder =
     Decode.field field << decoder
 
 
 {-| Builds a field.
 -}
-field : String -> ValueBuilder result -> FieldBuilder result
+field : String -> ValueBuilder a -> FieldBuilder a
 field name (ValueBuilder decoder) =
     FieldBuilder name decoder
 
@@ -116,6 +116,6 @@ boolean =
     primitive Decode.bool
 
 
-primitive : Decoder result -> ValueBuilder result
+primitive : Decoder a -> ValueBuilder a
 primitive decoder =
     ValueBuilder (always decoder)
