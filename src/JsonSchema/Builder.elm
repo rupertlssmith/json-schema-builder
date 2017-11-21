@@ -10,7 +10,7 @@ module JsonSchema.Builder
 
 {-| Module docs
 
-@docs Result, build, object, with, field
+@docs Result, build, object, with, field, string
 
 -}
 
@@ -28,57 +28,67 @@ type alias Result result =
     }
 
 
-type Builder result
-    = Builder (() -> Decoder result)
+type ObjectBuilder result
+    = ObjectBuilder (() -> Decoder result)
 
 
-build : Builder result -> Result result
-build (Builder decodeF) =
+{-| Runs the builder.
+-}
+build : ObjectBuilder result -> Result result
+build (ObjectBuilder decodeF) =
     { decoder = decodeF ()
     }
 
 
-object : (fields -> a) -> Builder (fields -> a)
+{-| Builds an object.
+-}
+object : (fields -> a) -> ObjectBuilder (fields -> a)
 object ctr =
-    Builder (always (Decode.succeed ctr))
+    ObjectBuilder (always (Decode.succeed ctr))
 
 
 map2 :
     (a -> b -> c)
-    -> Builder a
-    -> Builder b
-    -> Builder c
-map2 f (Builder decoderA) (Builder decoderB) =
+    -> ObjectBuilder a
+    -> ObjectBuilder b
+    -> ObjectBuilder c
+map2 f (ObjectBuilder decoderA) (ObjectBuilder decoderB) =
     let
         joinedDecoder selectionSet =
             Decode.map2 f (decoderA selectionSet) (decoderB selectionSet)
     in
-        Builder joinedDecoder
+        ObjectBuilder joinedDecoder
 
 
+{-| Adds fields to an object.
+-}
 with :
-    Builder a
-    -> Builder (a -> b)
-    -> Builder b
+    ObjectBuilder a
+    -> ObjectBuilder (a -> b)
+    -> ObjectBuilder b
 with selection objectSpec =
     map2 (<|) objectSpec selection
 
 
+{-| Builds a field.
+-}
 field :
     String
-    -> Builder result
-    -> Builder result
-field name (Builder decoder) =
-    Builder
+    -> ObjectBuilder result
+    -> ObjectBuilder result
+field name (ObjectBuilder decoder) =
+    ObjectBuilder
         decoder
 
 
-string : Builder String
+{-| Defines the type of a field as a string.
+-}
+string : ObjectBuilder String
 string =
     primitive Decode.string
 
 
-primitive : Decoder result -> Builder result
+primitive : Decoder result -> ObjectBuilder result
 primitive decoder =
-    Builder
+    ObjectBuilder
         (always decoder)
