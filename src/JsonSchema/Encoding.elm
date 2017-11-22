@@ -6,7 +6,7 @@ module JsonSchema.Encoding exposing (Test)
 
 -}
 
-import Json.Encode as Encode
+import Json.Encode as Encode exposing (Value)
 
 
 {-| Just an experiment
@@ -22,38 +22,52 @@ test =
     { a = 2, b = "tree" }
 
 
-f : Int -> List ( String, Encode.Value )
-f a =
-    [ (\field -> ( "a", Encode.int field )) a ]
+encode : String -> (a -> Value) -> a -> ( String, Value )
+encode name encoder =
+    (\field -> ( name, encoder field ))
 
 
-g : String -> List ( String, Encode.Value )
-g b =
-    [ (\field -> ( "b", Encode.string field )) b ]
+integer : String -> Int -> ( String, Value )
+integer name =
+    encode name Encode.int
 
 
-h : Int -> String -> List ( String, Encode.Value )
-h =
-    combine f g
+string : String -> String -> ( String, Value )
+string name =
+    encode name Encode.string
 
 
-encodedFields : Test -> Encode.Value
-encodedFields test =
-    h test.a test.b
-        |> Encode.object
+lift :
+    (obj -> field)
+    -> (field -> ( String, Encode.Value ))
+    -> (obj -> ( String, Encode.Value ))
+lift f encoder =
+    f >> encoder
+
+
+wrap :
+    (obj -> ( String, Encode.Value ))
+    -> (obj -> List ( String, Encode.Value ))
+wrap encode obj =
+    [ encode obj ]
 
 
 combine :
-    (a -> List ( String, Encode.Value ))
-    -> (b -> List ( String, Encode.Value ))
-    -> (a -> b -> List ( String, Encode.Value ))
-combine encodeA encodeB a b =
-    List.append (encodeA a) (encodeB b)
+    (obj -> ( String, Encode.Value ))
+    -> (obj -> List ( String, Encode.Value ))
+    -> (obj -> List ( String, Encode.Value ))
+combine encode encodeRemainder obj =
+    (encode obj) :: (encodeRemainder obj)
 
 
-testEncoder : Test -> Encode.Value
-testEncoder model =
-    [ (\field -> ( "a", Encode.int field )) model.a
-    , (\field -> ( "b", Encode.string field )) model.b
-    ]
+encodeTestFields : Test -> List ( String, Value )
+encodeTestFields =
+    combine
+        (lift .a (integer "a"))
+        (wrap (lift .b (string "b")))
+
+
+encodeTest : Test -> Value
+encodeTest test =
+    encodeTestFields test
         |> Encode.object
