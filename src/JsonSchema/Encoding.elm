@@ -37,11 +37,11 @@ string name =
     encode name Encode.string
 
 
-lift :
+compose :
     (obj -> field)
     -> (field -> ( String, Encode.Value ))
     -> (obj -> ( String, Encode.Value ))
-lift f encoder =
+compose f encoder =
     f >> encoder
 
 
@@ -60,14 +60,38 @@ combine encode encodeRemainder obj =
     (encode obj) :: (encodeRemainder obj)
 
 
-encodeTestFields : Test -> List ( String, Value )
-encodeTestFields =
-    combine
-        (lift .a (integer "a"))
-        (wrap (lift .b (string "b")))
-
-
 encodeTest : Test -> Value
 encodeTest test =
-    encodeTestFields test
-        |> Encode.object
+    Encode.object
+        (combine
+            (compose .a (integer "a"))
+            (wrap (compose .b (string "b")))
+            test
+        )
+
+
+
+-- field =
+--     compose
+--
+--
+-- object _ =
+--     combine
+--
+--
+-- with =
+--     identity
+--
+--
+-- build =
+--     Encode.object
+--
+--
+-- encodeTest2 : Test -> Value
+-- encodeTest2 test =
+--     build
+--         (object Test
+--             (with (field .a (integer "a")))
+--             (with (wrap (field .b (string "b"))))
+--             test
+--         )
