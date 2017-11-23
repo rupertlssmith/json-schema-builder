@@ -1,4 +1,4 @@
-module JsonSchema.Builder
+module JsonSchema.Decode
     exposing
         ( build
         , object

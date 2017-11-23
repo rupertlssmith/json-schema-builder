@@ -1,9 +1,9 @@
-module Builder exposing (..)
+module Decode exposing (..)
 
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer)
 import Test exposing (..)
-import JsonSchema.Builder exposing (..)
+import JsonSchema.Decode exposing (..)
 import Json.Decode as Decode
 import Result exposing (Result)
 

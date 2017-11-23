@@ -1,9 +1,9 @@
-module Encoding exposing (..)
+module Encode exposing (..)
 
 import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer)
 import Test exposing (..)
-import JsonSchema.Encoding exposing (..)
+import JsonSchema.Encode exposing (..)
 import Json.Encode exposing (Value)
 import Result exposing (Result)
 

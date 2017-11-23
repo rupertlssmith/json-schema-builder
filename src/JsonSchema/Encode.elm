@@ -1,4 +1,4 @@
-module JsonSchema.Encoding
+module JsonSchema.Encode
     exposing
         ( build
         , object
