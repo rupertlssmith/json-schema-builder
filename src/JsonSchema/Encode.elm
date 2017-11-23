@@ -20,6 +20,14 @@ module JsonSchema.Encode
 import Json.Encode as Encode exposing (Value)
 
 
+type alias Encoder a =
+    a -> Value
+
+
+type alias FieldEncoder a =
+    a -> List ( String, Value )
+
+
 {-| Runs the builder.
 -}
 build : (a -> List ( String, Value )) -> (a -> Value)
@@ -52,8 +60,8 @@ field :
     -> (obj -> field)
     -> (String -> field -> ( String, Value ))
     -> (obj -> List ( String, Value ))
-field name extractor encoder =
-    extractor >> (encoder name) >> List.singleton
+field name lens encoder =
+    lens >> (encoder name) >> List.singleton
 
 
 {-| Builds an integer type.

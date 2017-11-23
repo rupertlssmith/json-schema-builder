@@ -45,7 +45,11 @@ with ( field, decoder ) objectSpec =
 
 {-| Builds a field.
 -}
-field : String -> ext -> Decoder a -> ( String, Decoder a )
+field :
+    String
+    -> (obj -> a)
+    -> Decoder a
+    -> ( String, Decoder a )
 field name _ decoder =
     ( name, decoder )
 
