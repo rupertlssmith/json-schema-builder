@@ -40,7 +40,7 @@ objectSimpleFieldsEncoder =
 
 testDecodeObjectSimpleFields : Test
 testDecodeObjectSimpleFields =
-    test "An object with simple fields decodes." <|
+    test "An object with simple fields encodes." <|
         \_ ->
             let
                 value =
