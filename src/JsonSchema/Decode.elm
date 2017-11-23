@@ -22,48 +22,6 @@ import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
 
 
-type alias ObjectSimpleFields =
-    { a : String
-    , b : Int
-    , c : Float
-    , d : Bool
-    }
-
-
-obj : Decoder (String -> Int -> Float -> Bool -> ObjectSimpleFields)
-obj =
-    (object ObjectSimpleFields)
-
-
-one : Decoder (Int -> Float -> Bool -> ObjectSimpleFields)
-one =
-    (object ObjectSimpleFields)
-        |> with (field "a" .a string)
-
-
-two : Decoder (Float -> Bool -> ObjectSimpleFields)
-two =
-    ((object ObjectSimpleFields)
-        |> with (field "a" .a string)
-    )
-        |> with (field "b" .b integer)
-
-
-strf : Decoder (String -> b) -> Decoder b
-strf =
-    with (field "a" .a string)
-
-
-intf : Decoder (Int -> b) -> Decoder b
-intf =
-    with (field "b" .b integer)
-
-
-numf : Decoder (Float -> b) -> Decoder b
-numf =
-    with (field "c" .c number)
-
-
 {-| Runs the builder.
 -}
 build : Decoder a -> Decoder a

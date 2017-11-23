@@ -4,7 +4,7 @@ import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer)
 import Test exposing (..)
 import JsonSchema.Decode exposing (..)
-import Json.Decode as Decode
+import Json.Decode as Decode exposing (Decoder)
 import Result exposing (Result)
 
 
@@ -108,3 +108,37 @@ testDecodeObjectOuter =
 -- Value restrictions.
 -- Object property restrictions.
 -- Null, oneOf, allOf and anyOf.
+
+
+obj : Decoder (String -> Int -> Float -> Bool -> ObjectSimpleFields)
+obj =
+    (object ObjectSimpleFields)
+
+
+one : Decoder (Int -> Float -> Bool -> ObjectSimpleFields)
+one =
+    (object ObjectSimpleFields)
+        |> with (field "a" .a string)
+
+
+two : Decoder (Float -> Bool -> ObjectSimpleFields)
+two =
+    ((object ObjectSimpleFields)
+        |> with (field "a" .a string)
+    )
+        |> with (field "b" .b integer)
+
+
+strf : Decoder (String -> b) -> Decoder b
+strf =
+    with (field "a" .a string)
+
+
+intf : Decoder (Int -> b) -> Decoder b
+intf =
+    with (field "b" .b integer)
+
+
+numf : Decoder (Float -> b) -> Decoder b
+numf =
+    with (field "c" .c number)
