@@ -1,7 +1,6 @@
 module JsonSchema.Builder
     exposing
-        ( Result
-        , build
+        ( build
         , object
         , with
         , field
@@ -14,7 +13,7 @@ module JsonSchema.Builder
 {-| Module docs
 
 @docs string, integer, number, boolean
-@docs Result, build, object, with, field
+@docs build, object, with, field
 
 -}
 
@@ -65,19 +64,11 @@ numf =
     with (field "c" .c number)
 
 
-{-| The result.
--}
-type alias Result a =
-    { decoder : Decoder a
-    }
-
-
 {-| Runs the builder.
 -}
-build : Decoder a -> Result a
-build valDecoder =
-    { decoder = valDecoder
-    }
+build : Decoder a -> Decoder a
+build =
+    identity
 
 
 {-| Builds an object.

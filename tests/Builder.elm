@@ -24,7 +24,7 @@ objectSimpleFields =
     "{ \"a\" : \"test\", \"b\" : 2, \"c\" : 5.678, \"d\" : true }"
 
 
-objectSimpleFieldsResult =
+objectSimpleFieldsDecoder =
     build
         (object ObjectSimpleFields
             |> with (field "a" .a string)
@@ -38,7 +38,7 @@ testDecodeObjectSimpleFields : Test
 testDecodeObjectSimpleFields =
     test "An object with simple fields decodes." <|
         \_ ->
-            case Decode.decodeString objectSimpleFieldsResult.decoder objectSimpleFields of
+            case Decode.decodeString objectSimpleFieldsDecoder objectSimpleFields of
                 Ok object ->
                     Expect.all
                         [ .a >> Expect.equal "test"
@@ -66,7 +66,7 @@ objectOuter =
     "{ \"inner\" : { \"a\" : \"test\", \"b\" : 2, \"c\" : 5.678, \"d\" : true } }"
 
 
-objectOuterResult =
+objectOuterDecoder =
     build
         (object ObjectOuter
             |> with
@@ -86,7 +86,7 @@ testDecodeObjectOuter : Test
 testDecodeObjectOuter =
     test "An object with an inner object decodes." <|
         \_ ->
-            case Decode.decodeString objectOuterResult.decoder objectOuter of
+            case Decode.decodeString objectOuterDecoder objectOuter of
                 Ok object ->
                     Expect.all
                         [ .inner >> .a >> Expect.equal "test"
