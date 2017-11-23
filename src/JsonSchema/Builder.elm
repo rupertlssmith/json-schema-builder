@@ -23,6 +23,48 @@ import Json.Decode as Decode exposing (Decoder)
 import Json.Encode as Encode
 
 
+type alias ObjectSimpleFields =
+    { a : String
+    , b : Int
+    , c : Float
+    , d : Bool
+    }
+
+
+obj : ValueBuilder (String -> Int -> Float -> Bool -> ObjectSimpleFields)
+obj =
+    (object ObjectSimpleFields)
+
+
+one : ValueBuilder (Int -> Float -> Bool -> ObjectSimpleFields)
+one =
+    (object ObjectSimpleFields)
+        |> with (field "a" .a string)
+
+
+two : ValueBuilder (Float -> Bool -> ObjectSimpleFields)
+two =
+    ((object ObjectSimpleFields)
+        |> with (field "a" .a string)
+    )
+        |> with (field "b" .b integer)
+
+
+strf : ValueBuilder (String -> b) -> ValueBuilder b
+strf =
+    with (field "a" .a string)
+
+
+intf : ValueBuilder (Int -> b) -> ValueBuilder b
+intf =
+    with (field "b" .b integer)
+
+
+numf : ValueBuilder (Float -> b) -> ValueBuilder b
+numf =
+    with (field "c" .c number)
+
+
 {-| The result.
 -}
 type alias Result a =
@@ -83,8 +125,8 @@ fieldDecoder field decoder =
 
 {-| Builds a field.
 -}
-field : String -> ValueBuilder a -> FieldBuilder a
-field name (ValueBuilder decoder) =
+field : String -> ext -> ValueBuilder a -> FieldBuilder a
+field name _ (ValueBuilder decoder) =
     FieldBuilder name decoder
 
 

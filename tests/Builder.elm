@@ -27,10 +27,10 @@ objectSimpleFields =
 objectSimpleFieldsResult =
     build
         (object ObjectSimpleFields
-            |> with (field "a" string)
-            |> with (field "b" integer)
-            |> with (field "c" number)
-            |> with (field "d" boolean)
+            |> with (field "a" .a string)
+            |> with (field "b" .b integer)
+            |> with (field "c" .c number)
+            |> with (field "d" .d boolean)
         )
 
 
@@ -71,11 +71,12 @@ objectOuterResult =
         (object ObjectOuter
             |> with
                 (field "inner"
+                    .inner
                     (object ObjectSimpleFields
-                        |> with (field "a" string)
-                        |> with (field "b" integer)
-                        |> with (field "c" number)
-                        |> with (field "d" boolean)
+                        |> with (field "a" .a string)
+                        |> with (field "b" .b integer)
+                        |> with (field "c" .c number)
+                        |> with (field "d" .d boolean)
                     )
                 )
         )
