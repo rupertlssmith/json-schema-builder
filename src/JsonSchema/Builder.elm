@@ -75,18 +75,18 @@ type alias Result a =
 
 
 type ValueBuilder a
-    = ValueBuilder (() -> Decoder a)
+    = ValueBuilder (Decoder a)
 
 
 type FieldBuilder a
-    = FieldBuilder String (() -> Decoder a)
+    = FieldBuilder String (Decoder a)
 
 
 {-| Runs the builder.
 -}
 build : ValueBuilder a -> Result a
-build (ValueBuilder decodeF) =
-    { decoder = decodeF ()
+build (ValueBuilder valDecoder) =
+    { decoder = valDecoder
     }
 
 
@@ -94,14 +94,14 @@ build (ValueBuilder decodeF) =
 -}
 object : (fields -> a) -> ValueBuilder (fields -> a)
 object ctr =
-    ValueBuilder (always (Decode.succeed ctr))
+    ValueBuilder (Decode.succeed ctr)
 
 
 map2 : (a -> b -> c) -> ValueBuilder a -> ValueBuilder b -> ValueBuilder c
 map2 f (ValueBuilder decoderA) (ValueBuilder decoderB) =
     let
-        joinedDecoder _ =
-            Decode.map2 f (decoderA ()) (decoderB ())
+        joinedDecoder =
+            Decode.map2 f decoderA decoderB
     in
         ValueBuilder joinedDecoder
 
@@ -118,9 +118,9 @@ extract (FieldBuilder field decoder) =
     ValueBuilder (fieldDecoder field decoder)
 
 
-fieldDecoder : String -> (() -> Decoder a) -> (() -> Decoder a)
+fieldDecoder : String -> Decoder a -> Decoder a
 fieldDecoder field decoder =
-    Decode.field field << decoder
+    Decode.field field decoder
 
 
 {-| Builds a field.
@@ -160,4 +160,4 @@ boolean =
 
 primitive : Decoder a -> ValueBuilder a
 primitive decoder =
-    ValueBuilder (always decoder)
+    ValueBuilder decoder
