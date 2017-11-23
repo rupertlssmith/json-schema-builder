@@ -29,13 +29,9 @@ objectSimpleFieldsEncoder =
         (object ObjectSimpleFields
             |> with (field "a" .a string)
             |> with (field "b" .b integer)
+            |> with (field "c" .c number)
+            |> with (field "d" .d boolean)
         )
-
-
-
---     |> with (field "c" .c number)
---     |> with (field "d" .d boolean)
--- )
 
 
 testDecodeObjectSimpleFields : Test
@@ -52,35 +48,36 @@ testDecodeObjectSimpleFields =
                 Expect.pass
 
 
-obj : (obj -> List ( String, Value )) -> (obj -> List ( String, Value )) -> (obj -> List ( String, Value ))
-obj =
-    (object ObjectSimpleFields)
 
-
-one : ({ a | a : String } -> List ( String, Value )) -> { a | a : String } -> List ( String, Value )
-one =
-    (object ObjectSimpleFields)
-        |> with (field "a" .a string)
-
-
-two : { a | a : String, b : Int } -> List ( String, Value )
-two =
-    ((object ObjectSimpleFields)
-        |> with (field "a" .a string)
-    )
-        |> with (field "b" .b integer)
-
-
-strf : (({ a | a : String } -> List ( String, Value )) -> b) -> b
-strf =
-    with (field "a" .a string)
-
-
-intf : (({ a | b : Int } -> List ( String, Value )) -> b) -> b
-intf =
-    with (field "b" .b integer)
-
-
-numf : (({ a | c : Float } -> List ( String, Value )) -> b) -> b
-numf =
-    with (field "c" .c number)
+-- obj : (obj -> List ( String, Value )) -> (obj -> List ( String, Value )) -> (obj -> List ( String, Value ))
+-- obj =
+--     (object ObjectSimpleFields)
+--
+--
+-- one : ({ a | a : String } -> List ( String, Value )) -> { a | a : String } -> List ( String, Value )
+-- one =
+--     (object ObjectSimpleFields)
+--         |> with (field "a" .a string)
+--
+--
+-- two : { a | a : String, b : Int } -> List ( String, Value )
+-- two =
+--     ((object ObjectSimpleFields)
+--         |> with (field "a" .a string)
+--     )
+--         |> with (field "b" .b integer)
+--
+--
+-- strf : (({ a | a : String } -> List ( String, Value )) -> b) -> b
+-- strf =
+--     with (field "a" .a string)
+--
+--
+-- intf : (({ a | b : Int } -> List ( String, Value )) -> b) -> b
+-- intf =
+--     with (field "b" .b integer)
+--
+--
+-- numf : (({ a | c : Float } -> List ( String, Value )) -> b) -> b
+-- numf =
+--     with (field "c" .c number)

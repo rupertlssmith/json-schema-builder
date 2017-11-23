@@ -20,46 +20,30 @@ module JsonSchema.Encode
 import Json.Encode as Encode exposing (Value)
 
 
-type alias Encoder a =
-    a -> Value
-
-
-type alias FieldEncoder a =
-    a -> List ( String, Value )
-
-
-
---build : (a -> List ( String, Value )) -> (a -> Value)
-
-
 {-| Runs the builder.
 -}
+build : (obj -> List ( String, Value )) -> obj -> Value
 build fieldEncoder =
     fieldEncoder >> Encode.object
 
 
-
--- object :
---     cons
---     -> (obj -> List ( String, Value ))
---     -> (obj -> List ( String, Value ))
---     -> (obj -> List ( String, Value ))
-
-
 {-| Builds an object.
 -}
-object _ encodeField encodeRemainder obj =
-    List.append (encodeField obj) (encodeRemainder obj)
-
-
-
---with : a -> (a -> b) -> b
+object : cons -> obj -> List ( String, Value )
+object _ =
+    \obj -> []
 
 
 {-| Adds fields to an object.
 -}
+with : (obj -> List ( String, Value )) -> (obj -> List ( String, Value )) -> obj -> List ( String, Value )
 with field object =
-    object field
+    (\obj -> List.append (field obj) (object obj))
+
+
+
+-- encodeField encodeRemainder obj =
+--   List.append (encodeField obj) (encodeRemainder obj)
 
 
 {-| Builds a field.
