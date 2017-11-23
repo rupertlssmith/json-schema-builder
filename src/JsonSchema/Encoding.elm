@@ -20,6 +20,21 @@ module JsonSchema.Encoding
 import Json.Encode as Encode exposing (Value)
 
 
+try =
+    join
+        |> item
+        |> item
+        |> item
+
+
+join =
+    identity
+
+
+item =
+    identity
+
+
 type alias ObjectSimpleFields =
     { a : String
     , b : Int
@@ -28,10 +43,7 @@ type alias ObjectSimpleFields =
     }
 
 
-obj :
-    (obj -> List ( String, Value ))
-    -> (obj -> List ( String, Value ))
-    -> (obj -> List ( String, Value ))
+obj : (obj -> List ( String, Value )) -> (obj -> List ( String, Value )) -> (obj -> List ( String, Value ))
 obj =
     (object ObjectSimpleFields)
 
@@ -96,15 +108,33 @@ combineObjectEncoders :
     (obj -> List ( String, Value ))
     -> (obj -> List ( String, Value ))
     -> (obj -> List ( String, Value ))
-combineObjectEncoders encode encodeRemainder obj =
-    List.append (encode obj) (encodeRemainder obj)
+combineObjectEncoders encodeField encodeRemainder obj =
+    List.append (encodeField obj) (encodeRemainder obj)
+
+
+type alias Obj obj =
+    (obj -> List ( String, Value )) -> (obj -> List ( String, Value )) -> (obj -> List ( String, Value ))
+
+
+type alias Strf obj =
+    obj -> List ( String, Value )
+
+
+type alias Res obj =
+    (obj -> List ( String, Value )) -> (obj -> List ( String, Value ))
+
+
+
+--with : Strf obj -> Obj obj -> Res obj
+--with : a -> (a -> b -> c) -> (b -> c)
+--with : a -> (a -> b) -> b
 
 
 {-| Adds fields to an object.
 -}
 with : a -> (a -> b) -> b
-with a f =
-    f a
+with field object =
+    object field
 
 
 {-| Builds a field.
