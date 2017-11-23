@@ -4,7 +4,7 @@ import Expect exposing (Expectation)
 import Fuzz exposing (Fuzzer)
 import Test exposing (..)
 import JsonSchema.Encoding exposing (..)
-import Json.Decode as Decode
+import Json.Encode exposing (Value)
 import Result exposing (Result)
 
 
@@ -50,3 +50,37 @@ testDecodeObjectSimpleFields =
                     Debug.log "test" value
             in
                 Expect.pass
+
+
+obj : (obj -> List ( String, Value )) -> (obj -> List ( String, Value )) -> (obj -> List ( String, Value ))
+obj =
+    (object ObjectSimpleFields)
+
+
+one : ({ a | a : String } -> List ( String, Value )) -> { a | a : String } -> List ( String, Value )
+one =
+    (object ObjectSimpleFields)
+        |> with (field "a" .a string)
+
+
+two : { a | a : String, b : Int } -> List ( String, Value )
+two =
+    ((object ObjectSimpleFields)
+        |> with (field "a" .a string)
+    )
+        |> with (field "b" .b integer)
+
+
+strf : (({ a | a : String } -> List ( String, Value )) -> b) -> b
+strf =
+    with (field "a" .a string)
+
+
+intf : (({ a | b : Int } -> List ( String, Value )) -> b) -> b
+intf =
+    with (field "b" .b integer)
+
+
+numf : (({ a | c : Float } -> List ( String, Value )) -> b) -> b
+numf =
+    with (field "c" .c number)

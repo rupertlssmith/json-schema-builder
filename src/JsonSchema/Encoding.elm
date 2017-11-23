@@ -20,72 +20,6 @@ module JsonSchema.Encoding
 import Json.Encode as Encode exposing (Value)
 
 
-try =
-    join
-        |> item
-        |> item
-        |> item
-
-
-join =
-    identity
-
-
-item =
-    identity
-
-
-type alias ObjectSimpleFields =
-    { a : String
-    , b : Int
-    , c : Float
-    , d : Bool
-    }
-
-
-obj : (obj -> List ( String, Value )) -> (obj -> List ( String, Value )) -> (obj -> List ( String, Value ))
-obj =
-    (object ObjectSimpleFields)
-
-
-one : ({ a | a : String } -> List ( String, Value )) -> { a | a : String } -> List ( String, Value )
-one =
-    (object ObjectSimpleFields)
-        |> with (field "a" .a string)
-
-
-two : { a | a : String, b : Int } -> List ( String, Value )
-two =
-    ((object ObjectSimpleFields)
-        |> with (field "a" .a string)
-    )
-        |> with (field "b" .b integer)
-
-
-strf : (({ a | a : String } -> List ( String, Value )) -> b) -> b
-strf =
-    with (field "a" .a string)
-
-
-intf : (({ a | b : Int } -> List ( String, Value )) -> b) -> b
-intf =
-    with (field "b" .b integer)
-
-
-numf : (({ a | c : Float } -> List ( String, Value )) -> b) -> b
-numf =
-    with (field "c" .c number)
-
-
-objectSimpleFieldsEncoder =
-    build
-        (object ObjectSimpleFields
-            |> with (field "a" .a string)
-            |> with (field "b" .b integer)
-         --|> with (field "c" .c number)
-        )
-
-
 {-| Runs the builder.
 -}
 build : (a -> List ( String, Value )) -> (a -> Value)
@@ -110,24 +44,6 @@ combineObjectEncoders :
     -> (obj -> List ( String, Value ))
 combineObjectEncoders encodeField encodeRemainder obj =
     List.append (encodeField obj) (encodeRemainder obj)
-
-
-type alias Obj obj =
-    (obj -> List ( String, Value )) -> (obj -> List ( String, Value )) -> (obj -> List ( String, Value ))
-
-
-type alias Strf obj =
-    obj -> List ( String, Value )
-
-
-type alias Res obj =
-    (obj -> List ( String, Value )) -> (obj -> List ( String, Value ))
-
-
-
---with : Strf obj -> Obj obj -> Res obj
---with : a -> (a -> b -> c) -> (b -> c)
---with : a -> (a -> b) -> b
 
 
 {-| Adds fields to an object.
