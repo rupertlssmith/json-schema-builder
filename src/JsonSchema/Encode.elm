@@ -30,15 +30,15 @@ build fieldEncoder =
 {-| Builds an object.
 -}
 object : cons -> obj -> List ( String, Value )
-object _ =
-    \obj -> []
+object _ obj =
+    []
 
 
 {-| Adds fields to an object.
 -}
 with : (obj -> List ( String, Value )) -> (obj -> List ( String, Value )) -> obj -> List ( String, Value )
-with field object =
-    (\obj -> List.append (field obj) (object obj))
+with fieldEncoder remainderEncoder obj =
+    List.append (fieldEncoder obj) (remainderEncoder obj)
 
 
 {-| Builds a field.
