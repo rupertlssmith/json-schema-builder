@@ -41,11 +41,6 @@ with field object =
     (\obj -> List.append (field obj) (object obj))
 
 
-
--- encodeField encodeRemainder obj =
---   List.append (encodeField obj) (encodeRemainder obj)
-
-
 {-| Builds a field.
 -}
 field :
