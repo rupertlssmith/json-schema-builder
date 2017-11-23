@@ -1,41 +1,40 @@
-module JsonSchema.Encoding exposing (Test)
+module JsonSchema.Encoding
+    exposing
+        ( build
+        , object
+        , with
+        , field
+        , string
+        , integer
+        , number
+        , boolean
+        )
 
-{-| Very short docs.
+{-| Module docs
 
-@docs Test
+@docs string, integer, number, boolean
+@docs build, object, with, field
 
 -}
 
 import Json.Encode as Encode exposing (Value)
 
 
-{-| Just an experiment
+{-| Runs the builder.
 -}
-type alias Test =
-    { a : Int
-    , b : String
-    }
-
-
-test : Test
-test =
-    { a = 2, b = "tree" }
-
-
-testEncoder : Test -> Value
-testEncoder =
-    (object Test
-        |> with (field "a" .a integer)
-        |> with (field "b" .b string)
-    )
-        |> build
-
-
 build : (a -> List ( String, Value )) -> (a -> Value)
 build fieldEncoder =
     fieldEncoder >> Encode.object
 
 
+{-| Builds an object.
+-}
+object :
+    cons
+    -> (obj -> List ( String, Value ))
+    -> (obj -> List ( String, Value ))
+    -> obj
+    -> List ( String, Value )
 object _ =
     combineObjectEncoders
 
@@ -48,11 +47,15 @@ combineObjectEncoders encode encodeRemainder obj =
     List.append (encode obj) (encodeRemainder obj)
 
 
+{-| Adds fields to an object.
+-}
 with : a -> (a -> b) -> b
 with a f =
     f a
 
 
+{-| Builds a field.
+-}
 field :
     String
     -> (obj -> field)
@@ -70,14 +73,32 @@ objectFieldEncoder f encoder =
     f >> encoder >> List.singleton
 
 
+{-| Builds an integer type.
+-}
 integer : String -> Int -> ( String, Value )
 integer name =
     encode name Encode.int
 
 
+{-| Builds a string type.
+-}
 string : String -> String -> ( String, Value )
 string name =
     encode name Encode.string
+
+
+{-| Builds a number (float) type.
+-}
+number : String -> Float -> ( String, Value )
+number name =
+    encode name Encode.float
+
+
+{-| Builds a boolean type.
+-}
+boolean : String -> Bool -> ( String, Value )
+boolean name =
+    encode name Encode.bool
 
 
 encode : String -> (a -> Value) -> a -> ( String, Value )
