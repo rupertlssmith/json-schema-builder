@@ -28,27 +28,36 @@ type alias FieldEncoder a =
     a -> List ( String, Value )
 
 
+
+--build : (a -> List ( String, Value )) -> (a -> Value)
+
+
 {-| Runs the builder.
 -}
-build : (a -> List ( String, Value )) -> (a -> Value)
 build fieldEncoder =
     fieldEncoder >> Encode.object
 
 
+
+-- object :
+--     cons
+--     -> (obj -> List ( String, Value ))
+--     -> (obj -> List ( String, Value ))
+--     -> (obj -> List ( String, Value ))
+
+
 {-| Builds an object.
 -}
-object :
-    cons
-    -> (obj -> List ( String, Value ))
-    -> (obj -> List ( String, Value ))
-    -> (obj -> List ( String, Value ))
 object _ encodeField encodeRemainder obj =
     List.append (encodeField obj) (encodeRemainder obj)
 
 
+
+--with : a -> (a -> b) -> b
+
+
 {-| Adds fields to an object.
 -}
-with : a -> (a -> b) -> b
 with field object =
     object field
 
