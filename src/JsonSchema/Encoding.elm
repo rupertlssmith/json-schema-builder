@@ -22,9 +22,52 @@ test =
     { a = 2, b = "tree" }
 
 
-encode : String -> (a -> Value) -> a -> ( String, Value )
-encode name encoder =
-    (\field -> ( name, encoder field ))
+testEncoder : Test -> Value
+testEncoder =
+    (object Test
+        |> with (field "a" .a integer)
+        |> with (field "b" .b string)
+    )
+        |> build
+
+
+build : (a -> List ( String, Value )) -> (a -> Value)
+build fieldEncoder =
+    fieldEncoder >> Encode.object
+
+
+object _ =
+    combineObjectEncoders
+
+
+combineObjectEncoders :
+    (obj -> List ( String, Value ))
+    -> (obj -> List ( String, Value ))
+    -> (obj -> List ( String, Value ))
+combineObjectEncoders encode encodeRemainder obj =
+    List.append (encode obj) (encodeRemainder obj)
+
+
+with : a -> (a -> b) -> b
+with a f =
+    f a
+
+
+field :
+    String
+    -> (obj -> field)
+    -> (String -> field -> ( String, Value ))
+    -> (obj -> List ( String, Value ))
+field name extractor encoder =
+    objectFieldEncoder extractor (encoder name)
+
+
+objectFieldEncoder :
+    (obj -> field)
+    -> (field -> ( String, Value ))
+    -> (obj -> List ( String, Value ))
+objectFieldEncoder f encoder =
+    f >> encoder >> List.singleton
 
 
 integer : String -> Int -> ( String, Value )
@@ -37,61 +80,6 @@ string name =
     encode name Encode.string
 
 
-compose :
-    (obj -> field)
-    -> (field -> ( String, Encode.Value ))
-    -> (obj -> ( String, Encode.Value ))
-compose f encoder =
-    f >> encoder
-
-
-wrap :
-    (obj -> ( String, Encode.Value ))
-    -> (obj -> List ( String, Encode.Value ))
-wrap encode obj =
-    [ encode obj ]
-
-
-combine :
-    (obj -> ( String, Encode.Value ))
-    -> (obj -> List ( String, Encode.Value ))
-    -> (obj -> List ( String, Encode.Value ))
-combine encode encodeRemainder obj =
-    (encode obj) :: (encodeRemainder obj)
-
-
-encodeTest : Test -> Value
-encodeTest test =
-    Encode.object
-        (combine
-            (compose .a (integer "a"))
-            (wrap (compose .b (string "b")))
-            test
-        )
-
-
-
--- field =
---     compose
---
---
--- object _ =
---     combine
---
---
--- with =
---     identity
---
---
--- build =
---     Encode.object
---
---
--- encodeTest2 : Test -> Value
--- encodeTest2 test =
---     build
---         (object Test
---             (with (field .a (integer "a")))
---             (with (wrap (field .b (string "b"))))
---             test
---         )
+encode : String -> (a -> Value) -> a -> ( String, Value )
+encode name encoder =
+    (\field -> ( name, encoder field ))
