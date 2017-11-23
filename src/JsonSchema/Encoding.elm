@@ -34,15 +34,7 @@ object :
     -> (obj -> List ( String, Value ))
     -> (obj -> List ( String, Value ))
     -> (obj -> List ( String, Value ))
-object _ =
-    combineObjectEncoders
-
-
-combineObjectEncoders :
-    (obj -> List ( String, Value ))
-    -> (obj -> List ( String, Value ))
-    -> (obj -> List ( String, Value ))
-combineObjectEncoders encodeField encodeRemainder obj =
+object _ encodeField encodeRemainder obj =
     List.append (encodeField obj) (encodeRemainder obj)
 
 
@@ -61,15 +53,7 @@ field :
     -> (String -> field -> ( String, Value ))
     -> (obj -> List ( String, Value ))
 field name extractor encoder =
-    objectFieldEncoder extractor (encoder name)
-
-
-objectFieldEncoder :
-    (obj -> field)
-    -> (field -> ( String, Value ))
-    -> (obj -> List ( String, Value ))
-objectFieldEncoder f encoder =
-    f >> encoder >> List.singleton
+    extractor >> (encoder name) >> List.singleton
 
 
 {-| Builds an integer type.
