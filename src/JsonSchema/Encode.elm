@@ -20,6 +20,35 @@ module JsonSchema.Encode
 import Json.Encode as Encode exposing (Value)
 
 
+type alias ObjectSimpleFields =
+    { a : String
+    , b : Int
+    , c : Float
+    , d : Bool
+    }
+
+
+type alias ObjectOuter =
+    { inner : ObjectSimpleFields
+    }
+
+
+objectOuterEncoder =
+    build
+        (object ObjectOuter
+            |> with
+                (field "inner"
+                    .inner
+                    (object ObjectSimpleFields
+                        |> with (field "a" .a string)
+                        |> with (field "b" .b integer)
+                        |> with (field "c" .c number)
+                        |> with (field "d" .d boolean)
+                    )
+                )
+        )
+
+
 {-| Runs the builder.
 -}
 build : (obj -> List ( String, Value )) -> obj -> Value
@@ -29,7 +58,7 @@ build fieldEncoder =
 
 {-| Builds an object.
 -}
-object : cons -> obj -> List ( String, Value )
+object : cons -> String -> obj -> List ( String, Value )
 object _ obj =
     []
 
@@ -46,38 +75,38 @@ with fieldEncoder remainderEncoder obj =
 field :
     String
     -> (obj -> field)
-    -> (String -> field -> ( String, Value ))
+    -> (String -> field -> List ( String, Value ))
     -> (obj -> List ( String, Value ))
 field name lens encoder =
-    lens >> (encoder name) >> List.singleton
+    lens >> (encoder name)
 
 
 {-| Builds an integer type.
 -}
-integer : String -> Int -> ( String, Value )
+integer : String -> Int -> List ( String, Value )
 integer name =
-    encode name Encode.int
+    encode name Encode.int >> List.singleton
 
 
 {-| Builds a string type.
 -}
-string : String -> String -> ( String, Value )
+string : String -> String -> List ( String, Value )
 string name =
-    encode name Encode.string
+    encode name Encode.string >> List.singleton
 
 
 {-| Builds a number (float) type.
 -}
-number : String -> Float -> ( String, Value )
+number : String -> Float -> List ( String, Value )
 number name =
-    encode name Encode.float
+    encode name Encode.float >> List.singleton
 
 
 {-| Builds a boolean type.
 -}
-boolean : String -> Bool -> ( String, Value )
+boolean : String -> Bool -> List ( String, Value )
 boolean name =
-    encode name Encode.bool
+    encode name Encode.bool >> List.singleton
 
 
 encode : String -> (a -> Value) -> a -> ( String, Value )
