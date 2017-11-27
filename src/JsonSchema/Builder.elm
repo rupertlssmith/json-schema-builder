@@ -44,16 +44,6 @@ type Object
     = Nah
 
 
-
---
---
---type Field obj
---    = IntField String (obj -> Int)
---    | StrField String (obj -> String)
---    | NumField String (obj -> Float)
---    | BoolField String (obj -> Bool)
-
-
 {-| Field specifications.
 -}
 type Field obj
@@ -67,13 +57,8 @@ type Field obj
 {-| Runs the builder.
 -}
 build : List ( String, Field obj ) -> Field obj
-build fieldEncoder =
-    fieldEncoder |> encodeObject
-
-
-encodeObject : List ( String, Field obj ) -> Field obj
-encodeObject fields =
-    Object fields
+build fieldSpecs =
+    Object fieldSpecs
 
 
 {-| Builds an object.
@@ -92,11 +77,7 @@ with fieldEncoder remainderEncoder =
 
 {-| Builds a field.
 -}
-field :
-    String
-    -> (obj -> field)
-    -> ((obj -> field) -> Field obj)
-    -> List ( String, Field obj )
+field : String -> (obj -> field) -> ((obj -> field) -> Field obj) -> List ( String, Field obj )
 field name lens encoder =
     encode name lens encoder |> List.singleton
 
@@ -109,42 +90,26 @@ encode name lens encoder =
 {-| Builds an integer type.
 -}
 integer : (obj -> Int) -> Field obj
-integer lens =
-    encodeInt lens
+integer =
+    IntField
 
 
 {-| Builds a string type.
 -}
 string : (obj -> String) -> Field obj
-string lens =
-    encodeString lens
+string =
+    StrField
 
 
 {-| Builds a number (float) type.
 -}
 number : (obj -> Float) -> Field obj
-number lens =
-    encodeFloat lens
+number =
+    NumField
 
 
 {-| Builds a boolean type.
 -}
 boolean : (obj -> Bool) -> Field obj
-boolean lens =
-    encodeBool lens
-
-
-encodeInt lens =
-    IntField lens
-
-
-encodeString lens =
-    StrField lens
-
-
-encodeFloat lens =
-    NumField lens
-
-
-encodeBool lens =
-    BoolField lens
+boolean =
+    BoolField
