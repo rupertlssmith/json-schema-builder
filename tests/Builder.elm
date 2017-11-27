@@ -24,26 +24,24 @@ objectSimpleFields =
     }
 
 
+objectSimpleFieldsSpec =
+    object ObjectSimpleFields
+        |> with (field "a" .a string)
+        |> with (field "b" .b integer)
+        |> with (field "c" .c number)
+        |> with (field "d" .d boolean)
+        |> build
 
--- objectSimpleFieldsSpec =
---     build
---         (object ObjectSimpleFields
---             |> with (field "a" .a string)
---             |> with (field "b" .b integer)
---             |> with (field "c" .c number)
---             |> with (field "d" .d boolean)
---         )
---
---
--- testDecodeObjectSimpleFields : Test
--- testDecodeObjectSimpleFields =
---     test "An object with simple fields builds." <|
---         \_ ->
---             let
---                 value =
---                     objectSimpleFieldsSpec objectSimpleFields
---
---                 d =
---                     Debug.log "test" value
---             in
---                 Expect.pass
+
+testDecodeObjectSimpleFields : Test
+testDecodeObjectSimpleFields =
+    test "An object with simple fields builds." <|
+        \_ ->
+            let
+                value =
+                    objectSimpleFieldsSpec objectSimpleFields
+
+                d =
+                    Debug.log "test" value
+            in
+                Expect.pass

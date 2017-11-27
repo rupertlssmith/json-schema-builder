@@ -21,73 +21,130 @@ module JsonSchema.Builder
 -}
 
 
+type alias ObjectSimpleFields =
+    { a : String
+    , b : Int
+    , c : Float
+    , d : Bool
+    }
+
+
+objectSimpleFieldsSpec =
+    object ObjectSimpleFields
+        |> with (field "a" .a string)
+        |> with (field "b" .b integer)
+        |> with (field "c" .c number)
+        |> with (field "d" .d boolean)
+        |> build
+
+
 {-| Object specifications.
 -}
-type Object obj fields
-    = Object (fields -> obj) (List Field)
+type Object
+    = Object
+
+
+
+--
+--
+--type Field obj
+--    = IntField String (obj -> Int)
+--    | StrField String (obj -> String)
+--    | NumField String (obj -> Float)
+--    | BoolField String (obj -> Bool)
 
 
 {-| Field specifications.
 -}
-type Field obj
-    = IntField String (obj -> Int)
-    | StrField String (obj -> String)
-    | NumField String (obj -> Float)
-    | BoolField String (obj -> Bool)
+type Field
+    = Field
 
 
 {-| Runs the builder.
 -}
-build : Object obj fields -> Object obj fields
-build objectSpec =
-    objectSpec
+build : (obj -> List ( String, Field )) -> obj -> Field
+build fieldEncoder =
+    fieldEncoder >> encodeObject
 
 
 {-| Builds an object.
 -}
-object : (fields -> obj) -> Object obj fields
-object cons =
-    Object cons []
+object : cons -> obj -> List ( String, Field )
+object _ obj =
+    []
 
 
 {-| Adds fields to an object.
 -}
-with : (b -> List a) -> (b -> List a) -> b -> List a
-with fieldSpec remainderSpec obj =
-    List.append (fieldSpec obj) (remainderSpec obj)
+with : (obj -> List ( String, Field )) -> (obj -> List ( String, Field )) -> obj -> List ( String, Field )
+with fieldEncoder remainderEncoder obj =
+    List.append (fieldEncoder obj) (remainderEncoder obj)
 
 
 {-| Builds a field.
 -}
-field : a -> b -> (a -> b -> c) -> List c
-field name lens fieldType =
-    List.singleton <|
-        (fieldType name) lens
+field :
+    String
+    -> (obj -> field)
+    -> (field -> Field)
+    -> (obj -> List ( String, Field ))
+field name lens encoder =
+    lens >> (encode name encoder >> List.singleton)
 
 
 {-| Builds an integer type.
 -}
-integer : String -> (obj -> Int) -> Field obj
-integer name =
-    IntField name
+integer : Int -> Field
+integer =
+    encodeInt
 
 
 {-| Builds a string type.
 -}
-string : String -> (obj -> String) -> Field obj
-string name =
-    StrField name
+string : String -> Field
+string =
+    encodeString
 
 
 {-| Builds a number (float) type.
 -}
-number : String -> (obj -> Float) -> Field obj
-number name =
-    NumField name
+number : Float -> Field
+number =
+    encodeFloat
 
 
 {-| Builds a boolean type.
 -}
-boolean : String -> (obj -> Bool) -> Field obj
-boolean name =
-    BoolField name
+boolean : Bool -> Field
+boolean =
+    encodeBool
+
+
+encode : String -> (a -> Field) -> a -> ( String, Field )
+encode name encoder =
+    (\field -> ( name, encoder field ))
+
+
+encodeInt : Int -> Field
+encodeInt _ =
+    Field
+
+
+encodeString : String -> Field
+encodeString _ =
+    Field
+
+
+encodeFloat : Float -> Field
+encodeFloat _ =
+    Field
+
+
+encodeBool : Bool -> Field
+encodeBool _ =
+    Field
+
+
+encodeObject : List ( String, Field ) -> Field
+encodeObject _ =
+    Field
