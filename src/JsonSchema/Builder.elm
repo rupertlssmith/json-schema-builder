@@ -20,6 +20,44 @@ module JsonSchema.Builder
 -}
 
 
+type alias ObjectSimpleFields =
+    { a : String
+    , b : Int
+    , c : Float
+    , d : Bool
+    }
+
+
+type alias ObjectOuter =
+    { inner : ObjectSimpleFields
+    }
+
+
+objectSimpleFieldsSpec =
+    object ObjectSimpleFields
+        |> with (field "a" .a string)
+        |> with (field "b" .b integer)
+        |> with (field "c" .c number)
+        |> with (field "d" .d boolean)
+        |> build
+
+
+objectOuterFieldSpec =
+    object ObjectOuter
+        |> with
+            (field "inner"
+                .inner
+                (object ObjectSimpleFields
+                    |> with (field "a" .a string)
+                    |> with (field "b" .b integer)
+                    |> with (field "c" .c number)
+                    |> with (field "d" .d boolean)
+                    |> build
+                )
+            )
+        |> build
+
+
 {-| Struc specifications.
 -}
 type Struc obj
