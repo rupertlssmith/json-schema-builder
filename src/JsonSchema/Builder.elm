@@ -56,31 +56,36 @@ type Object
 
 {-| Field specifications.
 -}
-type Field
-    = IntField
-    | StrField
-    | NumField
-    | BoolField
-    | Object (List ( String, Field ))
+type Field obj
+    = IntField (obj -> Int)
+    | StrField (obj -> String)
+    | NumField (obj -> Float)
+    | BoolField (obj -> Bool)
+    | Object (List ( String, Field obj ))
 
 
 {-| Runs the builder.
 -}
-build : (obj -> List ( String, Field )) -> obj -> Field
+build : (obj -> List ( String, Field obj )) -> obj -> Field obj
 build fieldEncoder =
     fieldEncoder >> encodeObject
 
 
+encodeObject : List ( String, Field obj ) -> Field obj
+encodeObject fields =
+    Object fields
+
+
 {-| Builds an object.
 -}
-object : cons -> obj -> List ( String, Field )
+object : cons -> obj -> List ( String, Field obj )
 object _ obj =
     []
 
 
 {-| Adds fields to an object.
 -}
-with : (obj -> List ( String, Field )) -> (obj -> List ( String, Field )) -> obj -> List ( String, Field )
+with : (obj -> List ( String, Field obj )) -> (obj -> List ( String, Field obj )) -> obj -> List ( String, Field obj )
 with fieldEncoder remainderEncoder obj =
     List.append (fieldEncoder obj) (remainderEncoder obj)
 
@@ -90,65 +95,56 @@ with fieldEncoder remainderEncoder obj =
 field :
     String
     -> (obj -> field)
-    -> (field -> Field)
-    -> (obj -> List ( String, Field ))
+    -> ((obj -> field) -> field -> Field obj)
+    -> (obj -> List ( String, Field obj ))
 field name lens encoder =
-    lens >> (encode name encoder >> List.singleton)
+    lens >> (encode name lens encoder >> List.singleton)
+
+
+encode : String -> (obj -> field) -> ((obj -> field) -> field -> Field obj) -> field -> ( String, Field obj )
+encode name lens encoder =
+    (\field -> ( name, encoder lens field ))
 
 
 {-| Builds an integer type.
 -}
-integer : Int -> Field
-integer =
-    encodeInt
+integer : (obj -> Int) -> Int -> Field obj
+integer lens =
+    encodeInt lens
 
 
 {-| Builds a string type.
 -}
-string : String -> Field
-string =
-    encodeString
+string : (obj -> String) -> String -> Field obj
+string lens =
+    encodeString lens
 
 
 {-| Builds a number (float) type.
 -}
-number : Float -> Field
-number =
-    encodeFloat
+number : (obj -> Float) -> Float -> Field obj
+number lens =
+    encodeFloat lens
 
 
 {-| Builds a boolean type.
 -}
-boolean : Bool -> Field
-boolean =
-    encodeBool
+boolean : (obj -> Bool) -> Bool -> Field obj
+boolean lens =
+    encodeBool lens
 
 
-encode : String -> (a -> Field) -> a -> ( String, Field )
-encode name encoder =
-    (\field -> ( name, encoder field ))
+encodeInt lens _ =
+    IntField lens
 
 
-encodeInt : Int -> Field
-encodeInt _ =
-    IntField
+encodeString lens _ =
+    StrField lens
 
 
-encodeString : String -> Field
-encodeString _ =
-    StrField
+encodeFloat lens _ =
+    NumField lens
 
 
-encodeFloat : Float -> Field
-encodeFloat _ =
-    NumField
-
-
-encodeBool : Bool -> Field
-encodeBool _ =
-    BoolField
-
-
-encodeObject : List ( String, Field ) -> Field
-encodeObject fields =
-    Object fields
+encodeBool lens _ =
+    BoolField lens
