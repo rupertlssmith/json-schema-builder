@@ -41,7 +41,7 @@ objectSimpleFieldsSpec =
 {-| Object specifications.
 -}
 type Object
-    = Object
+    = Nah
 
 
 
@@ -57,7 +57,11 @@ type Object
 {-| Field specifications.
 -}
 type Field
-    = Field
+    = IntField
+    | StrField
+    | NumField
+    | BoolField
+    | Object (List ( String, Field ))
 
 
 {-| Runs the builder.
@@ -127,24 +131,24 @@ encode name encoder =
 
 encodeInt : Int -> Field
 encodeInt _ =
-    Field
+    IntField
 
 
 encodeString : String -> Field
 encodeString _ =
-    Field
+    StrField
 
 
 encodeFloat : Float -> Field
 encodeFloat _ =
-    Field
+    NumField
 
 
 encodeBool : Bool -> Field
 encodeBool _ =
-    Field
+    BoolField
 
 
 encodeObject : List ( String, Field ) -> Field
-encodeObject _ =
-    Field
+encodeObject fields =
+    Object fields
