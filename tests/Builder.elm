@@ -39,7 +39,7 @@ testDecodeObjectSimpleFields =
         \_ ->
             let
                 value =
-                    objectSimpleFieldsSpec objectSimpleFields
+                    objectSimpleFieldsSpec
 
                 d =
                     Debug.log "test" value

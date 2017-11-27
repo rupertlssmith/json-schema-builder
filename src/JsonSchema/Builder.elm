@@ -66,9 +66,9 @@ type Field obj
 
 {-| Runs the builder.
 -}
-build : (obj -> List ( String, Field obj )) -> obj -> Field obj
+build : List ( String, Field obj ) -> Field obj
 build fieldEncoder =
-    fieldEncoder >> encodeObject
+    fieldEncoder |> encodeObject
 
 
 encodeObject : List ( String, Field obj ) -> Field obj
@@ -78,16 +78,16 @@ encodeObject fields =
 
 {-| Builds an object.
 -}
-object : cons -> obj -> List ( String, Field obj )
-object _ obj =
+object : cons -> List ( String, Field obj )
+object _ =
     []
 
 
 {-| Adds fields to an object.
 -}
-with : (obj -> List ( String, Field obj )) -> (obj -> List ( String, Field obj )) -> obj -> List ( String, Field obj )
-with fieldEncoder remainderEncoder obj =
-    List.append (fieldEncoder obj) (remainderEncoder obj)
+with : List ( String, Field obj ) -> List ( String, Field obj ) -> List ( String, Field obj )
+with fieldEncoder remainderEncoder =
+    List.append (fieldEncoder) (remainderEncoder)
 
 
 {-| Builds a field.
@@ -95,56 +95,56 @@ with fieldEncoder remainderEncoder obj =
 field :
     String
     -> (obj -> field)
-    -> ((obj -> field) -> field -> Field obj)
-    -> (obj -> List ( String, Field obj ))
+    -> ((obj -> field) -> Field obj)
+    -> List ( String, Field obj )
 field name lens encoder =
-    lens >> (encode name lens encoder >> List.singleton)
+    encode name lens encoder |> List.singleton
 
 
-encode : String -> (obj -> field) -> ((obj -> field) -> field -> Field obj) -> field -> ( String, Field obj )
+encode : String -> (obj -> field) -> ((obj -> field) -> Field obj) -> ( String, Field obj )
 encode name lens encoder =
-    (\field -> ( name, encoder lens field ))
+    ( name, encoder lens )
 
 
 {-| Builds an integer type.
 -}
-integer : (obj -> Int) -> Int -> Field obj
+integer : (obj -> Int) -> Field obj
 integer lens =
     encodeInt lens
 
 
 {-| Builds a string type.
 -}
-string : (obj -> String) -> String -> Field obj
+string : (obj -> String) -> Field obj
 string lens =
     encodeString lens
 
 
 {-| Builds a number (float) type.
 -}
-number : (obj -> Float) -> Float -> Field obj
+number : (obj -> Float) -> Field obj
 number lens =
     encodeFloat lens
 
 
 {-| Builds a boolean type.
 -}
-boolean : (obj -> Bool) -> Bool -> Field obj
+boolean : (obj -> Bool) -> Field obj
 boolean lens =
     encodeBool lens
 
 
-encodeInt lens _ =
+encodeInt lens =
     IntField lens
 
 
-encodeString lens _ =
+encodeString lens =
     StrField lens
 
 
-encodeFloat lens _ =
+encodeFloat lens =
     NumField lens
 
 
-encodeBool lens _ =
+encodeBool lens =
     BoolField lens
