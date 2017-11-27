@@ -99,3 +99,13 @@ testDecodeObjectOuter =
                     Debug.log "test" value
             in
                 Expect.pass
+
+
+
+-- Objects with mutually recursive relationships.
+-- Arrays of simple types.
+-- String formats.
+-- Required and optional fields.
+-- Value restrictions.
+-- Object property restrictions.
+-- Null, oneOf, allOf and anyOf.
