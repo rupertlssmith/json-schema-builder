@@ -25,13 +25,12 @@ objectSimpleFields =
 
 
 objectSimpleFieldsDecoder =
-    build
-        (object ObjectSimpleFields
-            |> with (field "a" .a string)
-            |> with (field "b" .b integer)
-            |> with (field "c" .c number)
-            |> with (field "d" .d boolean)
-        )
+    object ObjectSimpleFields
+        |> with (field "a" .a string)
+        |> with (field "b" .b integer)
+        |> with (field "c" .c number)
+        |> with (field "d" .d boolean)
+        |> build
 
 
 testDecodeObjectSimpleFields : Test
@@ -67,19 +66,19 @@ objectOuter =
 
 
 objectOuterDecoder =
-    build
-        (object ObjectOuter
-            |> with
-                (field "inner"
-                    .inner
-                    (object ObjectSimpleFields
-                        |> with (field "a" .a string)
-                        |> with (field "b" .b integer)
-                        |> with (field "c" .c number)
-                        |> with (field "d" .d boolean)
-                    )
+    object ObjectOuter
+        |> with
+            (field "inner"
+                .inner
+                (object ObjectSimpleFields
+                    |> with (field "a" .a string)
+                    |> with (field "b" .b integer)
+                    |> with (field "c" .c number)
+                    |> with (field "d" .d boolean)
+                    |> build
                 )
-        )
+            )
+        |> build
 
 
 testDecodeObjectOuter : Test

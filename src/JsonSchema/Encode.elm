@@ -33,19 +33,13 @@ type alias ObjectOuter =
     }
 
 
-objectOuterEncoder =
+simpleEncoder =
     build
-        (object ObjectOuter
-            |> with
-                (field "inner"
-                    .inner
-                    (object ObjectSimpleFields
-                        |> with (field "a" .a string)
-                        |> with (field "b" .b integer)
-                        |> with (field "c" .c number)
-                        |> with (field "d" .d boolean)
-                    )
-                )
+        (object ObjectSimpleFields
+            |> with (field "a" .a string)
+            |> with (field "b" .b integer)
+            |> with (field "c" .c number)
+            |> with (field "d" .d boolean)
         )
 
 
@@ -58,7 +52,7 @@ build fieldEncoder =
 
 {-| Builds an object.
 -}
-object : cons -> String -> obj -> List ( String, Value )
+object : cons -> obj -> List ( String, Value )
 object _ obj =
     []
 
@@ -75,38 +69,38 @@ with fieldEncoder remainderEncoder obj =
 field :
     String
     -> (obj -> field)
-    -> (String -> field -> List ( String, Value ))
+    -> (field -> Value)
     -> (obj -> List ( String, Value ))
 field name lens encoder =
-    lens >> (encoder name)
+    lens >> (encode name encoder >> List.singleton)
 
 
 {-| Builds an integer type.
 -}
-integer : String -> Int -> List ( String, Value )
-integer name =
-    encode name Encode.int >> List.singleton
+integer : Int -> Value
+integer =
+    Encode.int
 
 
 {-| Builds a string type.
 -}
-string : String -> String -> List ( String, Value )
-string name =
-    encode name Encode.string >> List.singleton
+string : String -> Value
+string =
+    Encode.string
 
 
 {-| Builds a number (float) type.
 -}
-number : String -> Float -> List ( String, Value )
-number name =
-    encode name Encode.float >> List.singleton
+number : Float -> Value
+number =
+    Encode.float
 
 
 {-| Builds a boolean type.
 -}
-boolean : String -> Bool -> List ( String, Value )
-boolean name =
-    encode name Encode.bool >> List.singleton
+boolean : Bool -> Value
+boolean =
+    Encode.bool
 
 
 encode : String -> (a -> Value) -> a -> ( String, Value )
